@@ -249,15 +249,7 @@ export default function Dashboard() {
   // Recent
   const recent = useMemo(() => [...filtered].sort((a, b) => b.exitDate.localeCompare(a.exitDate) || b.timestamp.localeCompare(a.timestamp)).slice(0, 12), [filtered]);
 
-  // Floor spot heatmap (condo)
-  const spotFreq = useMemo(() => {
-    const c = {};
-    data.filter(d => d.location === "คอนโด" && d.note).forEach(d => {
-      const key = d.note.slice(0, 30);
-      c[key] = (c[key] || 0) + 1;
-    });
-    return Object.entries(c).map(([spot, count]) => ({ spot, count })).sort((a, b) => b.count - a.count).slice(0, 6);
-  }, [data]);
+  // Removed: spotFreq (not needed)
 
   const fmtCD = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
@@ -270,11 +262,11 @@ export default function Dashboard() {
   return (
     <div style={{
       minHeight: "100vh", color: C.tx,
-      fontFamily: "'Noto Sans Thai', 'SF Pro Display', -apple-system, sans-serif",
+      fontFamily: "'IBM Plex Sans Thai', 'SF Pro Display', -apple-system, sans-serif",
       background: `linear-gradient(180deg, #e0f2fe 0%, ${C.bg} 100%)`,
       paddingBottom: 60,
     }}>
-      <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
         @keyframes pulse2 { 0%,100% { opacity:1; } 50% { opacity:.35; } }
@@ -500,20 +492,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ━━━ Spot Frequency ━━━ */}
-        {spotFreq.length > 0 && (
-          <ChartCard title="📌 จุดจอดที่ใช้บ่อย (คอนโด)" subtitle="จุดจอดที่บันทึกซ้ำมากที่สุด" delay={760}>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={spotFreq} layout="vertical" barSize={20} margin={{ left: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
-                <XAxis type="number" stroke={C.txm} fontSize={12} allowDecimals={false} />
-                <YAxis type="category" dataKey="spot" stroke={C.txm} fontSize={11} width={180} />
-                <Tooltip content={<Tip />} />
-                <Bar dataKey="count" name="ครั้ง" fill={C.cyan} radius={[0, 8, 8, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        )}
+        {/* ━━━ Spot Frequency section removed ━━━ */}
 
         {/* ━━━ Daily Timeline ━━━ */}
         <ChartCard title="📈 จำนวนบันทึกรายวัน" subtitle="Timeline การบันทึกข้อมูล" delay={820}>
