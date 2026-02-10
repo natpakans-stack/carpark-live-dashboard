@@ -313,7 +313,7 @@ export default function Dashboard() {
 
       {/* ━━━ Header ━━━ */}
       <div style={{
-        background: "linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%)",
+        background: "linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%)",
         padding: "28px 24px 24px", position: "relative", overflow: "hidden",
       }}>
         <div style={{ position: "absolute", top: -50, right: -30, width: 200, height: 200, borderRadius: "50%", background: "rgba(255,255,255,.05)" }} />
@@ -363,7 +363,7 @@ export default function Dashboard() {
             {locations.filter(l => l !== "all").map(l => <option key={l} value={l}>{locIco(l)} {l}</option>)}
           </select>
           <button onClick={fetchData} disabled={loading} style={{
-            ...sel, background: loading ? C.border : "linear-gradient(135deg, #3b82f6, #2563eb)",
+            ...sel, background: loading ? C.border : "linear-gradient(135deg, #2563eb, #1e40af)",
             color: "#fff", fontWeight: 700, border: "none", transition: "all .2s",
             opacity: loading ? .6 : 1,
           }}>
