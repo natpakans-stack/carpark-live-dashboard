@@ -12,18 +12,18 @@ const SHEET_CSV_URL =
 
 const REFRESH_MS = 5 * 60 * 1000;
 
-// ━━━ Theme ━━━ (Updated: lighter colors for better accessibility)
+// ━━━ Theme ━━━ (Light Theme with WCAG 2.1 AA/AAA compliance)
 const C = {
-  bg: "#1e293b", bg2: "#334155",
-  card: "#334155", cardHi: "#475569",
-  border: "#475569", borderHi: "#64748b",
-  tx: "#f1f5f9", txm: "#cbd5e1", txd: "#94a3b8",
-  orange: "#fb923c", orangeD: "#ea580c",
-  blue: "#60a5fa", blueD: "#3b82f6",
-  purple: "#c084fc", purpleD: "#a855f7",
-  green: "#4ade80", greenD: "#22c55e",
-  yellow: "#fbbf24", red: "#f87171",
-  cyan: "#22d3ee", pink: "#f472b6",
+  bg: "#f8fafc", bg2: "#f1f5f9",
+  card: "#ffffff", cardHi: "#f8fafc",
+  border: "#e2e8f0", borderHi: "#cbd5e1",
+  tx: "#0f172a", txm: "#475569", txd: "#94a3b8",
+  orange: "#ea580c", orangeD: "#c2410c",
+  blue: "#2563eb", blueD: "#1e40af",
+  purple: "#7c3aed", purpleD: "#6d28d9",
+  green: "#16a34a", greenD: "#15803d",
+  yellow: "#ca8a04", red: "#dc2626",
+  cyan: "#0891b2", pink: "#db2777",
 };
 const locClr = l => l === "คอนโด" ? C.orange : l === "ที่ทำงาน" ? C.blue : l === "โรงแรม" ? C.purple : l === "อื่นๆ" ? C.pink : C.txm;
 const locIco = l => l === "คอนโด" ? "🏠" : l === "ที่ทำงาน" ? "🏢" : l === "โรงแรม" ? "🏨" : "📍";
@@ -39,7 +39,6 @@ function parseRows(csvData) {
   return csvData
     .map(row => ({
       timestamp: (row.Date || "").trim(),
-      time: (row.timeReminder || "").trim(),
       mapUrl: (row.parkingMap || "").trim(),
       floor: (row.parkingFloor || "").trim(),
       note: (row.note || "").trim(),
@@ -51,7 +50,7 @@ function parseRows(csvData) {
       if (!r.location || r.location === "") return false;
       if (isJunk(r.note)) return false;
       if (r.note.toLowerCase().includes("test") || r.note.includes("ทดสอบ") || r.note.includes("ทดลอง")) return false;
-      if (!r.exitDate || r.exitDate === " ") return false;
+      if (!r.timestamp || r.timestamp === "") return false;
       return true;
     });
 }
@@ -182,11 +181,12 @@ export default function Dashboard() {
   }, [data]);
   const topFloor = floorDist[0]?.floor || "-";
 
-  // Time of day
+  // Time of day (from timestamp - when parked)
   const timeDist = useMemo(() => {
     let m = 0, a = 0, e = 0;
     filtered.forEach(d => {
-      const h = parseInt(d.time);
+      const dt = new Date(d.timestamp);
+      const h = dt.getHours();
       if (h >= 5 && h < 12) m++;
       else if (h >= 12 && h < 18) a++;
       else e++;
@@ -206,15 +206,17 @@ export default function Dashboard() {
     return names.map((n, i) => ({ name: n, count: c[i] }));
   }, [filtered]);
 
-  // Avg time per location
+  // Avg arrival time per location (from timestamp)
   const avgByLoc = useMemo(() => {
     const g = {};
     data.forEach(d => {
-      if (!d.location || !d.time) return;
-      const [h, m] = d.time.split(":").map(Number);
+      if (!d.location || !d.timestamp) return;
+      const dt = new Date(d.timestamp);
+      const h = dt.getHours();
+      const m = dt.getMinutes();
       if (isNaN(h)) return;
       if (!g[d.location]) g[d.location] = [];
-      g[d.location].push(h * 60 + (m || 0));
+      g[d.location].push(h * 60 + m);
     });
     return Object.entries(g).map(([loc, times]) => {
       const avg = times.reduce((a, b) => a + b, 0) / times.length;
@@ -222,14 +224,20 @@ export default function Dashboard() {
     }).sort((a, b) => a.avg - b.avg);
   }, [data]);
 
-  // Condo morning trend
-  const condoAM = useMemo(() => {
-    return data.filter(d => d.location === "คอนโด").map(d => {
-      const [h, m] = d.time.split(":").map(Number);
-      return { date: d.exitDate?.slice(5) || "", time: d.time, min: h * 60 + (m || 0) };
-    }).filter(d => d.min >= 300 && d.min <= 720 && d.date).sort((a, b) => a.date.localeCompare(b.date));
+  // Arrival time trend (all locations)
+  const arrivalTrend = useMemo(() => {
+    return data.map(d => {
+      const dt = new Date(d.timestamp);
+      const h = dt.getHours();
+      const m = dt.getMinutes();
+      return {
+        date: d.timestamp?.slice(5, 10) || "",
+        time: `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
+        min: h * 60 + m,
+        location: d.location
+      };
+    }).filter(d => d.date && d.min >= 0).sort((a, b) => a.date.localeCompare(b.date));
   }, [data]);
-  const avgAM = condoAM.length ? Math.round(condoAM.reduce((a, b) => a + b.min, 0) / condoAM.length) : 0;
 
   // Daily count
   const daily = useMemo(() => {
@@ -263,7 +271,7 @@ export default function Dashboard() {
     <div style={{
       minHeight: "100vh", color: C.tx,
       fontFamily: "'Noto Sans Thai', 'SF Pro Display', -apple-system, sans-serif",
-      background: `radial-gradient(ellipse at 30% -10%, #475569 0%, ${C.bg} 60%), ${C.bg}`,
+      background: `linear-gradient(180deg, #e0f2fe 0%, ${C.bg} 100%)`,
       paddingBottom: 60,
     }}>
       <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -305,7 +313,7 @@ export default function Dashboard() {
 
       {/* ━━━ Header ━━━ */}
       <div style={{
-        background: "linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fdba74 100%)",
+        background: "linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%)",
         padding: "28px 24px 24px", position: "relative", overflow: "hidden",
       }}>
         <div style={{ position: "absolute", top: -50, right: -30, width: 200, height: 200, borderRadius: "50%", background: "rgba(255,255,255,.05)" }} />
@@ -355,7 +363,7 @@ export default function Dashboard() {
             {locations.filter(l => l !== "all").map(l => <option key={l} value={l}>{locIco(l)} {l}</option>)}
           </select>
           <button onClick={fetchData} disabled={loading} style={{
-            ...sel, background: loading ? C.border : "linear-gradient(135deg, #fb923c, #f97316)",
+            ...sel, background: loading ? C.border : "linear-gradient(135deg, #3b82f6, #2563eb)",
             color: "#fff", fontWeight: 700, border: "none", transition: "all .2s",
             opacity: loading ? .6 : 1,
           }}>
@@ -369,7 +377,7 @@ export default function Dashboard() {
           <KpiCard icon="🏠" label="คอนโด" value={condoTrips} suffix="ครั้ง" color={C.orange} delay={160} />
           <KpiCard icon="🏢" label="ที่ทำงาน" value={workTrips} suffix="ครั้ง" color={C.blue} delay={220} />
           <KpiCard icon="🅿️" label="ชั้นบ่อยสุด (คอนโด)" value={`ชั้น ${topFloor}`} suffix="" color={C.green} delay={280} />
-          <KpiCard icon="⏰" label="เฉลี่ยออก (เช้า)" value={`${String(Math.floor(avgAM / 60)).padStart(2, "0")}:${String(avgAM % 60).padStart(2, "0")}`} suffix="น." color={C.yellow} delay={340} />
+          <KpiCard icon="📊" label="บันทึกทั้งหมด" value={data.length} suffix="ครั้ง" color={C.purple} delay={340} />
         </div>
 
         {/* ━━━ Row 1 ━━━ */}
@@ -430,19 +438,19 @@ export default function Dashboard() {
           </ChartCard>
         </div>
 
-        {/* ━━━ Condo Morning Trend ━━━ */}
+        {/* ━━━ Arrival Time Trend ━━━ */}
         <ChartCard
-          title="⏰ เวลาที่ตั้งเตือน (คอนโด เช้า) — Trend"
-          subtitle={`เฉลี่ยทั้งหมด: ${String(Math.floor(avgAM / 60)).padStart(2, "0")}:${String(avgAM % 60).padStart(2, "0")} น.`}
+          title="⏰ เวลาที่บันทึก — Trend"
+          subtitle="เวลาที่ถึงสถานที่และบันทึกที่จอดรถ"
           delay={640}
         >
           <div style={{ marginTop: -8 }}>
             <ResponsiveContainer width="100%" height={270}>
-              <AreaChart data={condoAM}>
+              <AreaChart data={arrivalTrend}>
                 <defs>
-                  <linearGradient id="gO" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={C.orange} stopOpacity={.35} />
-                    <stop offset="95%" stopColor={C.orange} stopOpacity={0} />
+                  <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={C.blue} stopOpacity={.35} />
+                    <stop offset="95%" stopColor={C.blue} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
@@ -453,15 +461,15 @@ export default function Dashboard() {
                   if (!active || !payload?.length) return null;
                   const d = payload[0].payload;
                   return (
-                    <div style={{ background: C.card, border: `1px solid ${C.borderHi}`, borderRadius: 12, padding: "12px 16px", boxShadow: "0 12px 40px rgba(0,0,0,.5)" }}>
-                      <div style={{ color: C.txm, fontSize: 11 }}>{d.date}</div>
-                      <div style={{ color: C.orange, fontWeight: 800, fontSize: 22, fontFamily: "'JetBrains Mono'" }}>{d.time}</div>
+                    <div style={{ background: C.card, border: `1px solid ${C.borderHi}`, borderRadius: 12, padding: "12px 16px", boxShadow: "0 8px 24px rgba(0,0,0,.1)" }}>
+                      <div style={{ color: C.txm, fontSize: 11 }}>{d.date} • {d.location}</div>
+                      <div style={{ color: C.blue, fontWeight: 800, fontSize: 22, fontFamily: "'JetBrains Mono'" }}>{d.time}</div>
                     </div>
                   );
                 }} />
-                <Area type="monotone" dataKey="min" stroke={C.orange} strokeWidth={3} fill="url(#gO)"
-                  dot={{ r: 5, fill: C.orange, stroke: C.bg, strokeWidth: 2 }}
-                  activeDot={{ r: 7, fill: C.orange, stroke: "#fff", strokeWidth: 2 }} />
+                <Area type="monotone" dataKey="min" stroke={C.blue} strokeWidth={3} fill="url(#gB)"
+                  dot={{ r: 5, fill: C.blue, stroke: C.bg, strokeWidth: 2 }}
+                  activeDot={{ r: 7, fill: C.blue, stroke: C.bg, strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -472,7 +480,7 @@ export default function Dashboard() {
           background: C.card, borderRadius: 16, padding: 24, border: `1px solid ${C.border}`, marginTop: 16,
           animation: "fadeUp .5s 700ms ease both",
         }}>
-          <h3 style={{ margin: "0 0 14px", fontSize: 15, fontWeight: 700 }}>📊 เวลาเฉลี่ยที่ตั้งเตือน แยกตามสถานที่</h3>
+          <h3 style={{ margin: "0 0 14px", fontSize: 15, fontWeight: 700, color: C.tx }}>📊 เวลาที่บันทึกเฉลี่ย แยกตามสถานที่</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
             {avgByLoc.map((item, i) => (
               <div key={i} style={{
