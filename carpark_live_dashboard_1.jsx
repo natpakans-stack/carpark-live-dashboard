@@ -97,7 +97,7 @@ function KpiCard({ icon, label, value, suffix, color, delay }) {
 // ━━━ Chart Card ━━━
 function ChartCard({ title, subtitle, children, delay = 0 }) {
   return (
-    <div style={{
+    <div className="chart-card" style={{
       background: C.card, borderRadius: 16, padding: 24,
       border: `1px solid ${C.border}`,
       animation: `fadeUp .5s ${delay}ms ease both`,
@@ -274,6 +274,33 @@ export default function Dashboard() {
         ::-webkit-scrollbar { width:6px; height:6px; }
         ::-webkit-scrollbar-thumb { background:${C.borderHi}; border-radius:3px; }
         ::-webkit-scrollbar-track { background:transparent; }
+
+        /* Responsive Grid Classes */
+        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 768px) {
+          .grid-2col { grid-template-columns: 1fr; }
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 640px) {
+          .mobile-text-sm { font-size: 12px !important; }
+          .mobile-p-sm { padding: 16px !important; }
+
+          /* Header responsive */
+          h1 { font-size: 22px !important; }
+          .header-desc { font-size: 11px !important; }
+
+          /* Improve contrast on small screens */
+          body { -webkit-font-smoothing: antialiased; }
+
+          /* Card padding */
+          .chart-card { padding: 18px !important; }
+        }
+
+        /* Tablet Breakpoint */
+        @media (max-width: 1024px) and (min-width: 769px) {
+          /* Charts remain 2-column on tablets */
+        }
       `}</style>
 
       {/* ━━━ Header ━━━ */}
@@ -289,7 +316,7 @@ export default function Dashboard() {
               🚗 carpark tracker
             </div>
             <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0 }}>วันนี้จอดรถที่ไหน?</h1>
-            <p style={{ fontSize: 12, opacity: .7, margin: "4px 0 0" }}>
+            <p className="header-desc" style={{ fontSize: 12, opacity: .7, margin: "4px 0 0" }}>
               Real-time Dashboard — Auto refresh ทุก 5 นาที จาก Google Sheets
             </p>
           </div>
@@ -346,7 +373,7 @@ export default function Dashboard() {
         </div>
 
         {/* ━━━ Row 1 ━━━ */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 18 }}>
+        <div className="grid-2col" style={{ marginTop: 18 }}>
           <ChartCard title="📍 สัดส่วนสถานที่จอด" subtitle="จำนวนครั้งแยกตามสถานที่" delay={400}>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -375,7 +402,7 @@ export default function Dashboard() {
         </div>
 
         {/* ━━━ Row 2 ━━━ */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 16 }}>
+        <div className="grid-2col" style={{ marginTop: 16 }}>
           <ChartCard title="🕐 ช่วงเวลาที่จอด" subtitle="เช้า / บ่าย / เย็น-ดึก" delay={520}>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={timeDist} barSize={48}>
