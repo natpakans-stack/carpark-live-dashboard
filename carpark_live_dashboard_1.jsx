@@ -181,30 +181,7 @@ export default function Dashboard() {
   }, [data]);
   const topFloor = floorDist[0]?.floor || "-";
 
-  // Time of day (from timestamp - when parked)
-  const timeDist = useMemo(() => {
-    let m = 0, a = 0, e = 0;
-    filtered.forEach(d => {
-      const dt = new Date(d.timestamp);
-      const h = dt.getHours();
-      if (h >= 5 && h < 12) m++;
-      else if (h >= 12 && h < 18) a++;
-      else e++;
-    });
-    return [
-      { name: "เช้า (5-12)", value: m, fill: C.yellow },
-      { name: "บ่าย (12-18)", value: a, fill: C.orange },
-      { name: "เย็น-ดึก", value: e, fill: C.purple },
-    ];
-  }, [filtered]);
-
-  // Day of week
-  const dayDist = useMemo(() => {
-    const names = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."];
-    const c = Array(7).fill(0);
-    filtered.forEach(d => { const day = new Date(d.exitDate).getDay(); if (!isNaN(day)) c[day]++; });
-    return names.map((n, i) => ({ name: n, count: c[i] }));
-  }, [filtered]);
+  // Removed: timeDist and dayDist (not needed)
 
   // Avg arrival time per location (from timestamp)
   const avgByLoc = useMemo(() => {
@@ -312,11 +289,11 @@ export default function Dashboard() {
         <div style={{ position: "absolute", bottom: -70, left: 30, width: 160, height: 160, borderRadius: "50%", background: "rgba(255,255,255,.03)" }} />
         <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 600, opacity: .7, letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "#ffffff", opacity: .9, letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>
               🚗 carpark tracker
             </div>
-            <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0 }}>วันนี้จอดรถที่ไหน?</h1>
-            <p className="header-desc" style={{ fontSize: 12, opacity: .7, margin: "4px 0 0" }}>
+            <h1 style={{ fontSize: 28, fontWeight: 900, margin: 0, color: "#ffffff" }}>วันนี้จอดรถที่ไหน?</h1>
+            <p className="header-desc" style={{ fontSize: 12, color: "#ffffff", opacity: .9, margin: "4px 0 0" }}>
               Real-time Dashboard — Auto refresh ทุก 5 นาที จาก Google Sheets
             </p>
           </div>
@@ -364,7 +341,7 @@ export default function Dashboard() {
         </div>
 
         {/* ━━━ KPIs ━━━ */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(185px, 1fr))", gap: 14, marginTop: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(185px, 1fr))", gap: 20, marginTop: 24 }}>
           <KpiCard icon="🚗" label="เที่ยวทั้งหมด" value={totalTrips} suffix="ครั้ง" color={C.orange} delay={100} />
           <KpiCard icon="🏠" label="คอนโด" value={condoTrips} suffix="ครั้ง" color={C.orange} delay={160} />
           <KpiCard icon="🏢" label="ที่ทำงาน" value={workTrips} suffix="ครั้ง" color={C.blue} delay={220} />
@@ -373,7 +350,7 @@ export default function Dashboard() {
         </div>
 
         {/* ━━━ Row 1 ━━━ */}
-        <div className="grid-2col" style={{ marginTop: 18 }}>
+        <div className="grid-2col" style={{ marginTop: 24 }}>
           <ChartCard title="📍 สัดส่วนสถานที่จอด" subtitle="จำนวนครั้งแยกตามสถานที่" delay={400}>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -401,34 +378,7 @@ export default function Dashboard() {
           </ChartCard>
         </div>
 
-        {/* ━━━ Row 2 ━━━ */}
-        <div className="grid-2col" style={{ marginTop: 16 }}>
-          <ChartCard title="🕐 ช่วงเวลาที่จอด" subtitle="เช้า / บ่าย / เย็น-ดึก" delay={520}>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={timeDist} barSize={48}>
-                <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
-                <XAxis dataKey="name" stroke={C.txm} fontSize={11} />
-                <YAxis stroke={C.txm} fontSize={12} allowDecimals={false} />
-                <Tooltip content={<Tip />} />
-                <Bar dataKey="value" name="ครั้ง" radius={[8, 8, 0, 0]}>
-                  {timeDist.map((e, i) => <Cell key={i} fill={e.fill} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard title="📅 วันในสัปดาห์" subtitle="วันไหนบันทึกบ่อยสุด" delay={580}>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={dayDist} barSize={30}>
-                <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
-                <XAxis dataKey="name" stroke={C.txm} fontSize={12} />
-                <YAxis stroke={C.txm} fontSize={12} allowDecimals={false} />
-                <Tooltip content={<Tip />} />
-                <Bar dataKey="count" name="ครั้ง" fill={C.purple} radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        </div>
+        {/* ━━━ Row 2 removed (time/day charts) ━━━ */}
 
         {/* ━━━ Arrival Time Trend ━━━ */}
         <ChartCard
