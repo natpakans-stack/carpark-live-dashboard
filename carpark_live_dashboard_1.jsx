@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line,
-  AreaChart, Area
+  ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line
 } from "recharts";
 import Papa from "papaparse";
 
@@ -97,12 +96,12 @@ function KpiCard({ icon, label, value, suffix, color, delay }) {
 function ChartCard({ title, subtitle, children, delay = 0 }) {
   return (
     <div className="chart-card" style={{
-      background: C.card, borderRadius: 16, padding: 24,
+      background: C.card, borderRadius: 16, padding: 28,
       border: `1px solid ${C.border}`,
       animation: `fadeUp .5s ${delay}ms ease both`,
     }}>
       <h3 style={{ margin: "0 0 2px", fontSize: 15, fontWeight: 700, color: C.tx }}>{title}</h3>
-      {subtitle && <p style={{ margin: "0 0 14px", fontSize: 11, color: C.txm }}>{subtitle}</p>}
+      {subtitle && <p style={{ margin: "0 0 16px", fontSize: 11, color: C.txm }}>{subtitle}</p>}
       {children}
     </div>
   );
@@ -201,19 +200,26 @@ export default function Dashboard() {
     }).sort((a, b) => a.avg - b.avg);
   }, [data]);
 
-  // Arrival time trend (all locations)
+  // Arrival time trend (separate by location)
   const arrivalTrend = useMemo(() => {
-    return data.map(d => {
+    const byDate = {};
+    data.forEach(d => {
+      if (!d.timestamp) return;
       const dt = new Date(d.timestamp);
       const h = dt.getHours();
       const m = dt.getMinutes();
-      return {
-        date: d.timestamp?.slice(5, 10) || "",
-        time: `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
-        min: h * 60 + m,
-        location: d.location
-      };
-    }).filter(d => d.date && d.min >= 0).sort((a, b) => a.date.localeCompare(b.date));
+      if (isNaN(h)) return;
+      const fullDate = dt.toLocaleDateString("sv-SE", { timeZone: "Asia/Bangkok" });
+      const dayOfWeek = new Date(fullDate).getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) return;
+      const date = fullDate.slice(5);
+      if (!byDate[date]) byDate[date] = {};
+      if (d.location === "คอนโด") byDate[date].condo = h * 60 + m;
+      if (d.location === "ที่ทำงาน") byDate[date].work = h * 60 + m;
+    });
+    return Object.entries(byDate)
+      .map(([date, times]) => ({ date, ...times }))
+      .sort((a, b) => a.date.localeCompare(b.date));
   }, [data]);
 
   // Daily count
@@ -253,7 +259,7 @@ export default function Dashboard() {
         ::-webkit-scrollbar-track { background:transparent; }
 
         /* Responsive Grid Classes */
-        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
         @media (max-width: 768px) {
           .grid-2col { grid-template-columns: 1fr; }
         }
@@ -271,7 +277,16 @@ export default function Dashboard() {
           body { -webkit-font-smoothing: antialiased; }
 
           /* Card padding */
-          .chart-card { padding: 18px !important; }
+          .chart-card { padding: 20px !important; }
+
+          /* Recent table: hide หมายเหตุ + สถานะ on mobile */
+          .recent-table th:nth-child(5),
+          .recent-table td:nth-child(5),
+          .recent-table th:nth-child(6),
+          .recent-table td:nth-child(6) { display: none; }
+          .recent-table th,
+          .recent-table td { padding: 8px 6px !important; font-size: 11px !important; }
+          .loc-badge { white-space: nowrap !important; font-size: 10px !important; padding: 2px 7px !important; }
         }
 
         /* Tablet Breakpoint */
@@ -298,8 +313,8 @@ export default function Dashboard() {
             </p>
           </div>
           <div style={{
-            background: "rgba(0,0,0,.25)", borderRadius: 12, padding: "12px 16px",
-            fontSize: 12, backdropFilter: "blur(12px)", minWidth: 200,
+            background: "#1e293b", borderRadius: 12, padding: "12px 16px",
+            fontSize: 12, minWidth: 200, boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
               <div style={{
@@ -308,11 +323,11 @@ export default function Dashboard() {
                 boxShadow: `0 0 10px ${error ? C.red : C.green}`,
                 animation: "pulse2 2s infinite",
               }} />
-              <span style={{ fontWeight: 700 }}>{loading ? "Loading..." : error ? "Error" : "Live"}</span>
-              <span style={{ color: "rgba(255,255,255,.5)", marginLeft: "auto" }}>{data.length} rows</span>
+              <span style={{ fontWeight: 700, color: "#ffffff" }}>{loading ? "Loading..." : error ? "Error" : "Live"}</span>
+              <span style={{ color: "#cbd5e1", marginLeft: "auto" }}>{data.length} rows</span>
             </div>
-            {lastRefresh && <div style={{ opacity: .6, fontSize: 11 }}>Updated: {lastRefresh.toLocaleTimeString("th-TH")}</div>}
-            <div style={{ opacity: .6, fontSize: 11, fontFamily: "'JetBrains Mono'", marginTop: 2 }}>
+            {lastRefresh && <div style={{ color: "#cbd5e1", fontSize: 11 }}>Updated: {lastRefresh.toLocaleTimeString("th-TH", { timeZone: "Asia/Bangkok" })}</div>}
+            <div style={{ color: "#cbd5e1", fontSize: 11, fontFamily: "'JetBrains Mono'", marginTop: 2 }}>
               Next refresh: {fmtCD(countdown)}
             </div>
           </div>
@@ -341,7 +356,7 @@ export default function Dashboard() {
         </div>
 
         {/* ━━━ KPIs ━━━ */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(185px, 1fr))", gap: 20, marginTop: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(185px, 1fr))", gap: 20, marginTop: 28 }}>
           <KpiCard icon="🚗" label="เที่ยวทั้งหมด" value={totalTrips} suffix="ครั้ง" color={C.orange} delay={100} />
           <KpiCard icon="🏠" label="คอนโด" value={condoTrips} suffix="ครั้ง" color={C.orange} delay={160} />
           <KpiCard icon="🏢" label="ที่ทำงาน" value={workTrips} suffix="ครั้ง" color={C.blue} delay={220} />
@@ -350,7 +365,7 @@ export default function Dashboard() {
         </div>
 
         {/* ━━━ Row 1 ━━━ */}
-        <div className="grid-2col" style={{ marginTop: 24 }}>
+        <div className="grid-2col" style={{ marginTop: 28 }}>
           <ChartCard title="📍 สัดส่วนสถานที่จอด" subtitle="จำนวนครั้งแยกตามสถานที่" delay={400}>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -381,20 +396,15 @@ export default function Dashboard() {
         {/* ━━━ Row 2 removed (time/day charts) ━━━ */}
 
         {/* ━━━ Arrival Time Trend ━━━ */}
-        <ChartCard
-          title="⏰ เวลาที่บันทึก — Trend"
-          subtitle="เวลาที่ถึงสถานที่และบันทึกที่จอดรถ"
-          delay={640}
-        >
+        <div style={{ marginTop: 28 }}>
+          <ChartCard
+            title="⏰ เวลาที่บันทึก — Trend"
+            subtitle="เวลาที่ถึงสถานที่และบันทึกที่จอดรถ"
+            delay={640}
+          >
           <div style={{ marginTop: -8 }}>
             <ResponsiveContainer width="100%" height={270}>
-              <AreaChart data={arrivalTrend}>
-                <defs>
-                  <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={C.blue} stopOpacity={.35} />
-                    <stop offset="95%" stopColor={C.blue} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
+              <LineChart data={arrivalTrend}>
                 <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
                 <XAxis dataKey="date" stroke={C.txm} fontSize={11} />
                 <YAxis stroke={C.txm} fontSize={11} domain={["dataMin - 30", "dataMax + 30"]}
@@ -404,29 +414,44 @@ export default function Dashboard() {
                   const d = payload[0].payload;
                   return (
                     <div style={{ background: C.card, border: `1px solid ${C.borderHi}`, borderRadius: 12, padding: "12px 16px", boxShadow: "0 8px 24px rgba(0,0,0,.1)" }}>
-                      <div style={{ color: C.txm, fontSize: 11 }}>{d.date} • {d.location}</div>
-                      <div style={{ color: C.blue, fontWeight: 800, fontSize: 22, fontFamily: "'JetBrains Mono'" }}>{d.time}</div>
+                      <div style={{ color: C.txm, fontSize: 11, marginBottom: 6 }}>{d.date}</div>
+                      {d.condo !== undefined && (
+                        <div style={{ color: C.orange, fontWeight: 700, fontSize: 14, fontFamily: "'JetBrains Mono'", marginBottom: 2 }}>
+                          🏠 {Math.floor(d.condo / 60).toString().padStart(2, "0")}:{(d.condo % 60).toString().padStart(2, "0")}
+                        </div>
+                      )}
+                      {d.work !== undefined && (
+                        <div style={{ color: C.blue, fontWeight: 700, fontSize: 14, fontFamily: "'JetBrains Mono'" }}>
+                          🏢 {Math.floor(d.work / 60).toString().padStart(2, "0")}:{(d.work % 60).toString().padStart(2, "0")}
+                        </div>
+                      )}
                     </div>
                   );
                 }} />
-                <Area type="monotone" dataKey="min" stroke={C.blue} strokeWidth={3} fill="url(#gB)"
+                <Line type="monotone" dataKey="condo" name="คอนโด" stroke={C.orange} strokeWidth={3}
+                  dot={{ r: 5, fill: C.orange, stroke: C.bg, strokeWidth: 2 }}
+                  activeDot={{ r: 7, fill: C.orange, stroke: C.bg, strokeWidth: 2 }}
+                  connectNulls={false} />
+                <Line type="monotone" dataKey="work" name="ที่ทำงาน" stroke={C.blue} strokeWidth={3}
                   dot={{ r: 5, fill: C.blue, stroke: C.bg, strokeWidth: 2 }}
-                  activeDot={{ r: 7, fill: C.blue, stroke: C.bg, strokeWidth: 2 }} />
-              </AreaChart>
+                  activeDot={{ r: 7, fill: C.blue, stroke: C.bg, strokeWidth: 2 }}
+                  connectNulls={false} />
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </ChartCard>
+        </div>
 
         {/* ━━━ Avg by Location ━━━ */}
         <div style={{
-          background: C.card, borderRadius: 16, padding: 24, border: `1px solid ${C.border}`, marginTop: 16,
+          background: C.card, borderRadius: 16, padding: 28, border: `1px solid ${C.border}`, marginTop: 28,
           animation: "fadeUp .5s 700ms ease both",
         }}>
-          <h3 style={{ margin: "0 0 14px", fontSize: 15, fontWeight: 700, color: C.tx }}>📊 เวลาที่บันทึกเฉลี่ย แยกตามสถานที่</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+          <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: C.tx }}>📊 เวลาที่บันทึกเฉลี่ย แยกตามสถานที่</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16 }}>
             {avgByLoc.map((item, i) => (
               <div key={i} style={{
-                background: `${locClr(item.location)}0a`, borderRadius: 14, padding: "18px 20px",
+                background: `${locClr(item.location)}0a`, borderRadius: 14, padding: "20px 22px",
                 border: `1px solid ${locClr(item.location)}25`, transition: "border-color .2s",
               }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = locClr(item.location) + "55"}
@@ -445,7 +470,8 @@ export default function Dashboard() {
         {/* ━━━ Spot Frequency section removed ━━━ */}
 
         {/* ━━━ Daily Timeline ━━━ */}
-        <ChartCard title="📈 จำนวนบันทึกรายวัน" subtitle="Timeline การบันทึกข้อมูล" delay={820}>
+        <div style={{ marginTop: 28 }}>
+          <ChartCard title="📈 จำนวนบันทึกรายวัน" subtitle="Timeline การบันทึกข้อมูล" delay={820}>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={daily}>
               <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
@@ -457,18 +483,19 @@ export default function Dashboard() {
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
+        </div>
 
         {/* ━━━ Recent Table ━━━ */}
         <div style={{
-          background: C.card, borderRadius: 16, padding: 24, border: `1px solid ${C.border}`, marginTop: 16,
+          background: C.card, borderRadius: 16, padding: 28, border: `1px solid ${C.border}`, marginTop: 28,
           animation: "fadeUp .5s 880ms ease both",
         }}>
-          <h3 style={{ margin: "0 0 14px", fontSize: 15, fontWeight: 700 }}>🕑 รายการล่าสุด</h3>
+          <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700 }}>🕑 รายการล่าสุด</h3>
           <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <table className="recent-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr>
-                  {["วันที่", "เวลาเตือน", "สถานที่", "ชั้น", "หมายเหตุ", "สถานะ"].map(h => (
+                  {["วันที่", "เวลา", "สถานที่", "ชั้น", "หมายเหตุ", "สถานะ"].map(h => (
                     <th key={h} style={{ textAlign: "left", padding: "10px 12px", color: C.txm, fontWeight: 600, fontSize: 11, borderBottom: `2px solid ${C.border}`, whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
@@ -480,12 +507,15 @@ export default function Dashboard() {
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
                     <td style={{ padding: "10px 12px", fontFamily: "'JetBrains Mono'", fontSize: 12, borderBottom: `1px solid ${C.border}15` }}>{r.exitDate}</td>
-                    <td style={{ padding: "10px 12px", fontFamily: "'JetBrains Mono'", fontWeight: 700, borderBottom: `1px solid ${C.border}15` }}>{r.time}</td>
+                    <td style={{ padding: "10px 12px", fontFamily: "'JetBrains Mono'", fontWeight: 700, borderBottom: `1px solid ${C.border}15` }}>
+                      {r.timestamp ? new Date(r.timestamp).toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }) : "—"}
+                    </td>
                     <td style={{ padding: "10px 12px", borderBottom: `1px solid ${C.border}15` }}>
-                      <span style={{
+                      <span className="loc-badge" style={{
                         padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600,
                         background: `${locClr(r.location)}15`, color: locClr(r.location),
-                        border: `1px solid ${locClr(r.location)}35`,
+                        border: `1px solid ${locClr(r.location)}35`, whiteSpace: "nowrap",
+                        display: "inline-block",
                       }}>
                         {locIco(r.location)} {r.location}
                       </span>
