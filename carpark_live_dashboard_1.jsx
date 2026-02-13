@@ -118,6 +118,7 @@ export default function Dashboard() {
   const [countdown, setCountdown] = useState(REFRESH_MS / 1000);
   const [month, setMonth] = useState("all");
   const [loc, setLoc] = useState("all");
+  const [avgPeriod, setAvgPeriod] = useState("all");
 
   // ── Fetch ──
   const fetchData = useCallback(async () => {
@@ -184,10 +185,23 @@ export default function Dashboard() {
 
   // Avg arrival time per location (from timestamp)
   const avgByLoc = useMemo(() => {
+    const now = new Date();
+    const bangkokNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
     const g = {};
     data.forEach(d => {
       if (!d.location || !d.timestamp) return;
       const dt = new Date(d.timestamp);
+      if (avgPeriod === "week") {
+        const bangkokDt = new Date(dt.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+        const day = bangkokNow.getDay() || 7;
+        const weekStart = new Date(bangkokNow);
+        weekStart.setDate(bangkokNow.getDate() - day + 1);
+        weekStart.setHours(0, 0, 0, 0);
+        if (bangkokDt < weekStart) return;
+      } else if (avgPeriod === "month") {
+        const bangkokDt = new Date(dt.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+        if (bangkokDt.getMonth() !== bangkokNow.getMonth() || bangkokDt.getFullYear() !== bangkokNow.getFullYear()) return;
+      }
       const h = dt.getHours();
       const m = dt.getMinutes();
       if (isNaN(h)) return;
@@ -196,9 +210,9 @@ export default function Dashboard() {
     });
     return Object.entries(g).map(([loc, times]) => {
       const avg = times.reduce((a, b) => a + b, 0) / times.length;
-      return { location: loc, display: `${String(Math.floor(avg / 60)).padStart(2, "0")}:${String(Math.round(avg % 60)).padStart(2, "0")}`, avg };
+      return { location: loc, display: `${String(Math.floor(avg / 60)).padStart(2, "0")}:${String(Math.round(avg % 60)).padStart(2, "0")}`, avg, count: times.length };
     }).sort((a, b) => a.avg - b.avg);
-  }, [data]);
+  }, [data, avgPeriod]);
 
   // Arrival time trend (separate by location)
   const arrivalTrend = useMemo(() => {
@@ -222,11 +236,16 @@ export default function Dashboard() {
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [data]);
 
-  // Daily count
+  // Daily count (based on timestamp/Date column)
   const daily = useMemo(() => {
     const c = {};
-    filtered.forEach(d => c[d.exitDate] = (c[d.exitDate] || 0) + 1);
-    return Object.entries(c).map(([date, count]) => ({ date: date.slice(5), count })).sort((a, b) => a.date.localeCompare(b.date));
+    filtered.forEach(d => {
+      if (!d.timestamp) return;
+      const dt = new Date(d.timestamp);
+      const date = dt.toLocaleDateString("sv-SE", { timeZone: "Asia/Bangkok" }).slice(5);
+      c[date] = (c[date] || 0) + 1;
+    });
+    return Object.entries(c).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date));
   }, [filtered]);
 
   // Recent
@@ -447,7 +466,20 @@ export default function Dashboard() {
           background: C.card, borderRadius: 16, padding: 28, border: `1px solid ${C.border}`, marginTop: 28,
           animation: "fadeUp .5s 700ms ease both",
         }}>
-          <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: C.tx }}>📊 เวลาที่บันทึกเฉลี่ย แยกตามสถานที่</h3>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: C.tx }}>📊 เวลาที่บันทึกเฉลี่ย แยกตามสถานที่</h3>
+            <div style={{ display: "flex", gap: 4, background: C.bg2, borderRadius: 10, padding: 3 }}>
+              {[["all", "ทั้งหมด"], ["week", "สัปดาห์นี้"], ["month", "เดือนนี้"]].map(([key, label]) => (
+                <button key={key} onClick={() => setAvgPeriod(key)} style={{
+                  padding: "5px 12px", borderRadius: 8, border: "none", fontSize: 11, fontWeight: 600,
+                  fontFamily: "inherit", cursor: "pointer", transition: "all .2s",
+                  background: avgPeriod === key ? C.card : "transparent",
+                  color: avgPeriod === key ? C.tx : C.txm,
+                  boxShadow: avgPeriod === key ? "0 1px 4px rgba(0,0,0,.1)" : "none",
+                }}>{label}</button>
+              ))}
+            </div>
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16 }}>
             {avgByLoc.map((item, i) => (
               <div key={i} style={{
@@ -461,7 +493,7 @@ export default function Dashboard() {
                 <div style={{ fontSize: 36, fontWeight: 800, color: locClr(item.location), fontFamily: "'JetBrains Mono', monospace" }}>
                   {item.display}
                 </div>
-                <div style={{ fontSize: 11, color: C.txd }}>เฉลี่ย (น.)</div>
+                <div style={{ fontSize: 11, color: C.txd }}>เฉลี่ย ({item.count} ครั้ง)</div>
               </div>
             ))}
           </div>
@@ -479,7 +511,16 @@ export default function Dashboard() {
               <YAxis stroke={C.txm} fontSize={12} allowDecimals={false} />
               <Tooltip content={<Tip />} />
               <Line type="monotone" dataKey="count" name="บันทึก" stroke={C.green} strokeWidth={2.5}
-                dot={{ r: 4, fill: C.green, stroke: C.bg, strokeWidth: 2 }} />
+                dot={({ cx, cy, payload }) => (
+                  payload.count >= 2 ? (
+                    <g key={payload.date}>
+                      <circle cx={cx} cy={cy} r={10} fill={C.green} stroke={C.bg} strokeWidth={2} />
+                      <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="central" fill="#fff" fontSize={11} fontWeight={700}>✓</text>
+                    </g>
+                  ) : (
+                    <circle key={payload.date} cx={cx} cy={cy} r={4} fill={C.green} stroke={C.bg} strokeWidth={2} />
+                  )
+                )} />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -539,6 +580,7 @@ export default function Dashboard() {
         {/* ━━━ Footer ━━━ */}
         <div style={{ textAlign: "center", marginTop: 36, color: C.txd, fontSize: 11 }}>
           🚗 Carpark Tracker Dashboard — Google Sheets CSV → React (recharts) — Auto refresh every 5 min
+          <div style={{ marginTop: 4, fontSize: 10, color: C.txd, opacity: .6 }}>v1.5.0</div>
         </div>
       </div>
     </div>
