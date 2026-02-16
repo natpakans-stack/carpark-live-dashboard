@@ -570,6 +570,8 @@ export default function Dashboard() {
                     <td style={{ padding: "10px 12px", borderBottom: `1px solid ${C.border}15` }}>
                       {r.status.startsWith("SENT") ? (
                         <span style={{ fontSize: 11, fontWeight: 600, color: C.green, background: `${C.green}15`, padding: "2px 8px", borderRadius: 6 }}>✓ Sent</span>
+                      ) : r.status.includes("กรอกย้อนหลัง") ? (
+                        <span style={{ fontSize: 11, fontWeight: 600, color: C.orange, background: `${C.orange}15`, padding: "2px 8px", borderRadius: 6 }}>กรอกย้อนหลัง</span>
                       ) : (
                         <span style={{ fontSize: 11, fontWeight: 600, color: C.red, background: `${C.red}15`, padding: "2px 8px", borderRadius: 6 }} title={r.status}>✗ Fail</span>
                       )}
