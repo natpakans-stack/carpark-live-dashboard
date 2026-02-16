@@ -38,12 +38,13 @@ function parseRows(csvData) {
   return csvData
     .map(row => ({
       timestamp: (row.Date || "").trim(),
+      time: (row.TimeUseTracking || "").trim(),
       mapUrl: (row.parkingMap || "").trim(),
       floor: (row.parkingFloor || "").trim(),
       note: (row.note || "").trim(),
       location: (row.parkingLocation || "").trim(),
       exitDate: (row["exitDateReminder "] || row.exitDateReminder || "").trim(),
-      status: (Object.values(row).pop() || "").trim(),
+      status: (row.NoteType || "").trim(),
     }))
     .filter(r => {
       if (!r.location || r.location === "") return false;
@@ -183,30 +184,30 @@ export default function Dashboard() {
 
   // Removed: timeDist and dayDist (not needed)
 
-  // Avg arrival time per location (from timestamp)
+  // Avg arrival time per location (from TimeUseTracking)
   const avgByLoc = useMemo(() => {
     const now = new Date();
     const bangkokNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
     const g = {};
     data.forEach(d => {
-      if (!d.location || !d.timestamp) return;
-      const dt = new Date(d.timestamp);
-      if (avgPeriod === "week") {
+      if (!d.location || !d.time) return;
+      const [h, m] = d.time.split(":").map(Number);
+      if (isNaN(h)) return;
+      if (avgPeriod === "week" && d.timestamp) {
+        const dt = new Date(d.timestamp);
         const bangkokDt = new Date(dt.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
         const day = bangkokNow.getDay() || 7;
         const weekStart = new Date(bangkokNow);
         weekStart.setDate(bangkokNow.getDate() - day + 1);
         weekStart.setHours(0, 0, 0, 0);
         if (bangkokDt < weekStart) return;
-      } else if (avgPeriod === "month") {
+      } else if (avgPeriod === "month" && d.timestamp) {
+        const dt = new Date(d.timestamp);
         const bangkokDt = new Date(dt.toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
         if (bangkokDt.getMonth() !== bangkokNow.getMonth() || bangkokDt.getFullYear() !== bangkokNow.getFullYear()) return;
       }
-      const h = dt.getHours();
-      const m = dt.getMinutes();
-      if (isNaN(h)) return;
       if (!g[d.location]) g[d.location] = [];
-      g[d.location].push(h * 60 + m);
+      g[d.location].push(h * 60 + (m || 0));
     });
     return Object.entries(g).map(([loc, times]) => {
       const avg = times.reduce((a, b) => a + b, 0) / times.length;
@@ -214,22 +215,19 @@ export default function Dashboard() {
     }).sort((a, b) => a.avg - b.avg);
   }, [data, avgPeriod]);
 
-  // Arrival time trend (separate by location)
+  // Arrival time trend (separate by location, from TimeUseTracking)
   const arrivalTrend = useMemo(() => {
     const byDate = {};
     data.forEach(d => {
-      if (!d.timestamp) return;
-      const dt = new Date(d.timestamp);
-      const h = dt.getHours();
-      const m = dt.getMinutes();
+      if (!d.time || !d.exitDate) return;
+      const [h, m] = d.time.split(":").map(Number);
       if (isNaN(h)) return;
-      const fullDate = dt.toLocaleDateString("sv-SE", { timeZone: "Asia/Bangkok" });
-      const dayOfWeek = new Date(fullDate).getDay();
+      const dayOfWeek = new Date(d.exitDate).getDay();
       if (dayOfWeek === 0 || dayOfWeek === 6) return;
-      const date = fullDate.slice(5);
+      const date = d.exitDate.slice(5);
       if (!byDate[date]) byDate[date] = {};
-      if (d.location === "คอนโด") byDate[date].condo = h * 60 + m;
-      if (d.location === "ที่ทำงาน") byDate[date].work = h * 60 + m;
+      if (d.location === "คอนโด") byDate[date].condo = h * 60 + (m || 0);
+      if (d.location === "ที่ทำงาน") byDate[date].work = h * 60 + (m || 0);
     });
     return Object.entries(byDate)
       .map(([date, times]) => ({ date, ...times }))
@@ -549,7 +547,7 @@ export default function Dashboard() {
                   >
                     <td style={{ padding: "10px 12px", fontFamily: "'JetBrains Mono'", fontSize: 12, borderBottom: `1px solid ${C.border}15` }}>{r.exitDate}</td>
                     <td style={{ padding: "10px 12px", fontFamily: "'JetBrains Mono'", fontWeight: 700, borderBottom: `1px solid ${C.border}15` }}>
-                      {r.timestamp ? new Date(r.timestamp).toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }) : "—"}
+                      {r.time || "—"}
                     </td>
                     <td style={{ padding: "10px 12px", borderBottom: `1px solid ${C.border}15` }}>
                       <span className="loc-badge" style={{
