@@ -36,16 +36,22 @@ const isJunk = (note = "") => {
 // ━━━ Parse rows ━━━
 function parseRows(csvData) {
   return csvData
-    .map(row => ({
-      timestamp: (row.Date || "").trim(),
-      time: (row.TimeUseTracking || "").trim(),
-      mapUrl: (row.parkingMap || "").trim(),
-      floor: (row.parkingFloor || "").trim(),
-      note: (row.note || "").trim(),
-      location: (row.parkingLocation || "").trim(),
-      exitDate: (row["exitDateReminder "] || row.exitDateReminder || "").trim(),
-      status: (row.NoteType || "").trim(),
-    }))
+    .map(row => {
+      const timestamp = (row.Date || "").trim();
+      const exitRaw = (row["exitDateReminder "] || row.exitDateReminder || "").trim();
+      // กรอกย้อนหลัง: ไม่มี exitDate → ใช้วันที่จาก Date column แทน
+      const exitDate = exitRaw || (timestamp ? new Date(timestamp).toLocaleDateString("sv-SE", { timeZone: "Asia/Bangkok" }) : "");
+      return {
+        timestamp,
+        time: (row.timeForgot || "").trim(),
+        mapUrl: (row.parkingMap || "").trim(),
+        floor: (row.parkingFloor || "").trim(),
+        note: (row.note || "").trim(),
+        location: (row.parkingLocation || "").trim(),
+        exitDate,
+        status: (row.NoteType || "").trim(),
+      };
+    })
     .filter(r => {
       if (!r.location || r.location === "") return false;
       if (isJunk(r.note)) return false;
