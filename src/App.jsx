@@ -39,13 +39,13 @@ function parseRows(csvData) {
   return csvData
     .map(row => ({
       timestamp: (row.Date || "").trim(),
-      time: (row.timeReminder || "").trim(),
+      time: (row.TimeUseTracking || "").trim(),
       mapUrl: (row.parkingMap || "").trim(),
       floor: (row.parkingFloor || "").trim(),
       note: (row.note || "").trim(),
       location: (row.parkingLocation || "").trim(),
       exitDate: (row["exitDateReminder "] || row.exitDateReminder || "").trim(),
-      status: (Object.values(row).pop() || "").trim(),
+      status: (row.NoteType || "").trim(),
     }))
     .filter(r => {
       if (!r.location || r.location === "") return false;
@@ -405,7 +405,7 @@ export default function Dashboard() {
 
         {/* ━━━ Condo Morning Trend ━━━ */}
         <ChartCard
-          title="⏰ เวลาที่ตั้งเตือน (คอนโด เช้า) — Trend"
+          title="⏰ เวลาที่บันทึก (คอนโด เช้า) — Trend"
           subtitle={`เฉลี่ยทั้งหมด: ${String(Math.floor(avgAM / 60)).padStart(2, "0")}:${String(avgAM % 60).padStart(2, "0")} น.`}
           delay={640}
         >
@@ -445,7 +445,7 @@ export default function Dashboard() {
           background: C.card, borderRadius: 16, padding: 24, border: `1px solid ${C.border}`, marginTop: 16,
           animation: "fadeUp .5s 700ms ease both",
         }}>
-          <h3 style={{ margin: "0 0 14px", fontSize: 15, fontWeight: 700 }}>📊 เวลาเฉลี่ยที่ตั้งเตือน แยกตามสถานที่</h3>
+          <h3 style={{ margin: "0 0 14px", fontSize: 15, fontWeight: 700 }}>📊 เวลาเฉลี่ยที่บันทึก แยกตามสถานที่</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
             {avgByLoc.map((item, i) => (
               <div key={i} style={{
@@ -504,7 +504,7 @@ export default function Dashboard() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr>
-                  {["วันที่", "เวลาเตือน", "สถานที่", "ชั้น", "หมายเหตุ", "สถานะ"].map(h => (
+                  {["วันที่", "เวลาที่บันทึก", "สถานที่", "ชั้น", "หมายเหตุ", "สถานะ"].map(h => (
                     <th key={h} style={{ textAlign: "left", padding: "10px 12px", color: C.txm, fontWeight: 600, fontSize: 11, borderBottom: `2px solid ${C.border}`, whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
