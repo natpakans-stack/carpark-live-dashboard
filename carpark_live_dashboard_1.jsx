@@ -584,9 +584,15 @@ export default function Dashboard() {
         </div>
 
         {/* ━━━ Footer ━━━ */}
-        <div style={{ textAlign: "center", marginTop: 36, color: C.txd, fontSize: 11 }}>
-          🚗 Carpark Tracker Dashboard — Google Sheets CSV → React (recharts) — Auto refresh every 5 min
-          <div style={{ marginTop: 4, fontSize: 10, color: C.txd, opacity: .6 }}>v1.5.0</div>
+        <div style={{ textAlign: "center", marginBottom: 0, lineHeight: 0, height: 200, overflow: "hidden" }}>
+          <img src="https://natpakans-stack.github.io/talk-to-figma-mcp/assets/aw-mascot.avif" alt="Aw mascot" style={{ width: 320, height: "auto" }} />
+        </div>
+        <div style={{ textAlign: "center", padding: "24px 20px 40px", color: C.txd, fontSize: 14, borderTop: "1px solid #e4e4eb" }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
+            <a href="https://natpakans-stack.github.io/line-messaging-portfolio" style={{ color: "#a259ff", textDecoration: "none" }}>line-messaging-portfolio</a>
+            <a href="https://natpakans-stack.github.io/parking-reminder-portfolio" style={{ color: "#a259ff", textDecoration: "none" }}>parking-reminder-portfolio</a>
+            <a href="https://natpakans-stack.github.io/carpark_live_dashboard" style={{ color: "#a259ff", textDecoration: "none" }}>carpark_live_dashboard</a>
+          </div>
         </div>
       </div>
     </div>
