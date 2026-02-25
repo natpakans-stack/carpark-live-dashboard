@@ -553,7 +553,7 @@ export default function Dashboard() {
                   >
                     <td style={{ padding: "10px 12px", fontFamily: "'JetBrains Mono'", fontSize: 12, borderBottom: `1px solid ${C.border}15` }}>{r.exitDate}</td>
                     <td style={{ padding: "10px 12px", fontFamily: "'JetBrains Mono'", fontWeight: 700, borderBottom: `1px solid ${C.border}15` }}>
-                      {r.time || "—"}
+                      {r.time || (r.timestamp ? new Date(r.timestamp).toLocaleTimeString("th-TH", { timeZone: "Asia/Bangkok", hour: "2-digit", minute: "2-digit", hour12: false }) : "—")}
                     </td>
                     <td style={{ padding: "10px 12px", borderBottom: `1px solid ${C.border}15` }}>
                       <span className="loc-badge" style={{
@@ -584,14 +584,25 @@ export default function Dashboard() {
         </div>
 
         {/* ━━━ Footer ━━━ */}
-        <div style={{ textAlign: "center", marginBottom: 0, lineHeight: 0, height: 200, overflow: "hidden" }}>
-          <img src="https://natpakans-stack.github.io/talk-to-figma-mcp/assets/aw-mascot.avif" alt="Aw mascot" style={{ width: 320, height: "auto" }} />
-        </div>
-        <div style={{ textAlign: "center", padding: "24px 20px 40px", color: C.txd, fontSize: 14, borderTop: "1px solid #e4e4eb" }}>
-          <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
-            <a href="https://natpakans-stack.github.io/line-messaging-portfolio" style={{ color: "#a259ff", textDecoration: "none" }}>line-messaging-portfolio</a>
-            <a href="https://natpakans-stack.github.io/parking-reminder-portfolio" style={{ color: "#a259ff", textDecoration: "none" }}>parking-reminder-portfolio</a>
-            <a href="https://natpakans-stack.github.io/carpark-live-dashboard" style={{ color: "#a259ff", textDecoration: "none" }}>carpark_live_dashboard</a>
+        <div style={{ textAlign: "center", padding: "48px 24px 64px", borderTop: `1px solid ${C.border}`, marginTop: 48 }}>
+          <div style={{ marginBottom: 0, lineHeight: 0, height: 200, overflow: "hidden" }}>
+            <img src="https://natpakans-stack.github.io/talk-to-figma-mcp/assets/aw-mascot.avif" alt="Aw mascot" style={{ width: 320, height: "auto" }} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 10, marginTop: 24 }}>
+            {[
+              { label: "line-messaging-portfolio", href: "https://natpakans-stack.github.io/line-messaging-portfolio" },
+              { label: "parking-reminder-portfolio", href: "https://natpakans-stack.github.io/parking-reminder-portfolio" },
+              { label: "carpark-live-dashboard", href: "https://natpakans-stack.github.io/carpark-live-dashboard" },
+            ].map(l => (
+              <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" style={{
+                background: C.card, border: `1px solid ${C.border}`, padding: "8px 16px",
+                borderRadius: 50, fontSize: 13, fontWeight: 500, color: C.txm,
+                textDecoration: "none", transition: "all .2s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#a259ff"; e.currentTarget.style.color = "#a259ff"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.txm; }}
+              >{l.label}</a>
+            ))}
           </div>
         </div>
       </div>
