@@ -591,7 +591,7 @@ export default function Dashboard() {
           <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
             <a href="https://natpakans-stack.github.io/line-messaging-portfolio" style={{ color: "#a259ff", textDecoration: "none" }}>line-messaging-portfolio</a>
             <a href="https://natpakans-stack.github.io/parking-reminder-portfolio" style={{ color: "#a259ff", textDecoration: "none" }}>parking-reminder-portfolio</a>
-            <a href="https://natpakans-stack.github.io/carpark_live_dashboard" style={{ color: "#a259ff", textDecoration: "none" }}>carpark_live_dashboard</a>
+            <a href="https://natpakans-stack.github.io/carpark-live-dashboard" style={{ color: "#a259ff", textDecoration: "none" }}>carpark_live_dashboard</a>
           </div>
         </div>
       </div>
