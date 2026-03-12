@@ -3,13 +3,39 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="https://framerusercontent.com/images/c0z2TLP8Vruh4UchIrSxQOCMIk.png?width=64&height=64">
+    <link rel="apple-touch-icon" href="https://framerusercontent.com/images/c0z2TLP8Vruh4UchIrSxQOCMIk.png?width=180&height=180">
     <title>Carpark Live Dashboard</title>
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Carpark Live Dashboard">
+  <meta name="twitter:description" content="Real-time dashboard แสดงสถานะที่จอดรถ — Vue 3 + Firebase Realtime Database ดูจำนวนที่ว่างแบบ Live">
+  <meta property="og:url" content="https://projects.tanplanet.info/carpark_live_dashboard/">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://projects.tanplanet.info/carpark_live_dashboard/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:description" content="Real-time dashboard แสดงสถานะที่จอดรถ — Vue 3 + Firebase Realtime Database ดูจำนวนที่ว่างแบบ Live">
+  <meta property="og:title" content="Carpark Live Dashboard">
+  <meta name="description" content="Real-time dashboard แสดงสถานะที่จอดรถ — Vue 3 + Firebase Realtime Database ดูจำนวนที่ว่างแบบ Live">
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-    </style>
+    
+.back-nav{position:fixed;top:16px;left:16px;z-index:1000;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9999px;background:rgba(26,28,46,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);color:#fff;text-decoration:none;font-size:13px;font-weight:600;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.back-nav:hover{background:rgba(26,28,46,0.95);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.back-nav svg{width:16px;height:16px}
+.back-to-top{position:fixed;bottom:24px;right:24px;z-index:1000;width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(26,28,46,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);color:#fff;opacity:0;visibility:hidden;transition:all .3s ease;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.back-to-top.visible{opacity:1;visibility:visible}
+.back-to-top:hover{background:rgba(26,28,46,0.95);transform:translateY(-2px)}
+.back-to-top svg{width:20px;height:20px}
+</style>
   </head>
   <body>
+<a class="back-nav" href="https://projects.tanplanet.info/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Portfolio</a>
+<button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-  </body>
+  <script>
+(function(){var b=document.querySelector('.back-to-top');if(b)window.addEventListener('scroll',function(){b.classList.toggle('visible',window.scrollY>300)})})();
+</script>
+</body>
 </html>
