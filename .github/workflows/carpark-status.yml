@@ -1,0 +1,45 @@
+name: Carpark status
+
+# ดึงผลจาก Apps Script web app มาเขียนเป็นไฟล์ static (status.txt / status.json)
+# บน GitHub Pages — เพื่อให้ AI ที่เปิดลิงก์ redirect ไม่ได้ (เช่น Gemini) อ่านได้
+# ลิงก์ผลลัพธ์:
+#   https://natpakans-stack.github.io/carpark-live-dashboard/status.txt
+#   https://natpakans-stack.github.io/carpark-live-dashboard/status.json
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'   # ทุก ~10 นาที (GitHub อาจหน่วงจริง 10-20 นาที)
+  workflow_dispatch:          # กดรันเองได้จากแท็บ Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: carpark-status
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch status from Apps Script
+        run: |
+          mkdir -p out
+          curl -sSL --fail --retry 3 --retry-delay 5 \
+            "https://script.google.com/macros/s/AKfycbxwsvLCO475XlC0IJpScoUkorSibLBJ72-E7WSMkqhW7JNsoyLiEAcF4Q5I6xCG8h6pHw/exec" \
+            -o out/status.json
+          # ตรวจว่าได้ JSON ที่มี summary จริง — ถ้าไม่ใช่ ให้ล้มเหลว (กันแปะไฟล์พัง)
+          summary=$(jq -er '.summary' out/status.json)
+          printf '%s\n' "$summary" > out/status.txt
+          echo "✅ $summary"
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          publish_branch: gh-pages
+          keep_files: true   # ไม่ลบไฟล์ dashboard เดิมบน gh-pages
+          commit_message: 'chore: update carpark status [skip ci]'
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
