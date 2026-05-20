@@ -1,19 +1,19 @@
 {
-  "updated": "2026-05-20T21:14:07+07:00",
-  "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 4 (19/05/2026 19:28)",
+  "updated": "2026-05-21T00:33:40+07:00",
+  "summary": "ล่าสุดจอดที่ ที่ทำงาน (20/05/2026 21:34) — ที่นี่ไม่บันทึกชั้น | คอนโดครั้งล่าสุด: ชั้น 2 (20/05/2026 21:32)",
   "current": {
-    "location": "คอนโด",
-    "floor": "4",
-    "time": "19:28",
+    "location": "ที่ทำงาน",
+    "floor": "",
+    "time": "22:10",
     "note": "",
-    "status": "SENT",
-    "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-05-19T19:28:46+07:00"
+    "status": "กรอกย้อนหลัง",
+    "mapUrl": "https://maps.app.goo.gl/Gyy37MMCh7x61uy57",
+    "recordedAt": "2026-05-20T21:34:01+07:00"
   },
   "latestCondo": {
-    "floor": "4",
+    "floor": "2",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-05-19T19:28:46+07:00"
+    "recordedAt": "2026-05-20T21:32:52+07:00"
   },
-  "totalRecords": 91
+  "totalRecords": 93
 }
