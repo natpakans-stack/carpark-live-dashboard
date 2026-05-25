@@ -1,12 +1,12 @@
 {
-  "updated": "2026-05-25T20:57:54+07:00",
+  "updated": "2026-05-25T23:24:07+07:00",
   "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 1A (25/05/2026 20:36)",
   "current": {
     "location": "คอนโด",
     "floor": "1A",
     "time": "20:36",
     "note": "จอกช่องแรก",
-    "status": "LINE_FAIL[1]:LINE Push failed (429): {\"message\":\"You have reached your monthly limit.\"}",
+    "status": "EXPIRED",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
     "recordedAt": "2026-05-25T20:36:43+07:00"
   },
