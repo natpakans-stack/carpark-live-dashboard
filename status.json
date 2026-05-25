@@ -1,19 +1,19 @@
 {
-  "updated": "2026-05-25T17:55:20+07:00",
-  "summary": "ล่าสุดจอดที่ ที่ทำงาน (25/05/2026 10:12) — ที่นี่ไม่บันทึกชั้น | คอนโดครั้งล่าสุด: ชั้น 5 (22/05/2026 23:40)",
+  "updated": "2026-05-25T20:57:54+07:00",
+  "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 1A (25/05/2026 20:36)",
   "current": {
-    "location": "ที่ทำงาน",
-    "floor": "",
-    "time": "10:12",
-    "note": "",
-    "status": "EXPIRED",
-    "mapUrl": "https://maps.app.goo.gl/Gyy37MMCh7x61uy57",
-    "recordedAt": "2026-05-25T10:12:06+07:00"
+    "location": "คอนโด",
+    "floor": "1A",
+    "time": "20:36",
+    "note": "จอกช่องแรก",
+    "status": "LINE_FAIL[1]:LINE Push failed (429): {\"message\":\"You have reached your monthly limit.\"}",
+    "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
+    "recordedAt": "2026-05-25T20:36:43+07:00"
   },
   "latestCondo": {
-    "floor": "5",
+    "floor": "1A",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-05-22T23:40:28+07:00"
+    "recordedAt": "2026-05-25T20:36:43+07:00"
   },
-  "totalRecords": 98
+  "totalRecords": 99
 }
