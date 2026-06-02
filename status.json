@@ -1,19 +1,19 @@
 {
-  "updated": "2026-06-02T18:03:30+07:00",
-  "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 1A (25/05/2026 20:36)",
+  "updated": "2026-06-02T22:05:20+07:00",
+  "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 4 (2/06/2026 19:09)",
   "current": {
     "location": "คอนโด",
-    "floor": "1A",
-    "time": "20:36",
-    "note": "จอกช่องแรก",
-    "status": "EXPIRED",
+    "floor": "4",
+    "time": "19:09",
+    "note": "หน้าประตูเลย",
+    "status": "SENT",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-05-25T20:36:43+07:00"
+    "recordedAt": "2026-06-02T19:09:42+07:00"
   },
   "latestCondo": {
-    "floor": "1A",
+    "floor": "4",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-05-25T20:36:43+07:00"
+    "recordedAt": "2026-06-02T19:09:42+07:00"
   },
-  "totalRecords": 99
+  "totalRecords": 100
 }
