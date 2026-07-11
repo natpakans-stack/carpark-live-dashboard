@@ -1,19 +1,19 @@
 {
-  "updated": "2026-07-11T18:02:40+07:00",
-  "summary": "ล่าสุดจอดที่ ห้าง (11/07/2026 16:20) ชั้น 1M | คอนโดครั้งล่าสุด: ชั้น 3A (10/07/2026 08:32)",
+  "updated": "2026-07-11T19:01:02+07:00",
+  "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 1 (11/07/2026 18:54)",
   "current": {
-    "location": "ห้าง",
-    "floor": "1M",
-    "time": "16:20",
-    "note": "อาหารจอดรถ B ",
+    "location": "คอนโด",
+    "floor": "1",
+    "time": "18:54",
+    "note": "ข้างในเลย",
     "status": "SENT",
-    "mapUrl": "",
-    "recordedAt": "2026-07-11T16:20:37+07:00"
+    "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
+    "recordedAt": "2026-07-11T18:54:03+07:00"
   },
   "latestCondo": {
-    "floor": "3A",
+    "floor": "1",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-07-10T08:32:25+07:00"
+    "recordedAt": "2026-07-11T18:54:03+07:00"
   },
-  "totalRecords": 107
+  "totalRecords": 108
 }
