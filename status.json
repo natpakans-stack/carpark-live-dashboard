@@ -1,19 +1,19 @@
 {
-  "updated": "2026-09-19T00:25:25+07:00",
-  "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 5 (19/08/2026 21:51)",
+  "updated": "2026-09-19T02:50:30+07:00",
+  "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 6 (19/09/2026 01:29)",
   "current": {
     "location": "คอนโด",
-    "floor": "5",
-    "time": "21:51",
+    "floor": "6",
+    "time": "01:29",
     "note": "",
     "status": "SENT",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-08-19T21:51:06+07:00"
+    "recordedAt": "2026-09-19T01:29:55+07:00"
   },
   "latestCondo": {
-    "floor": "5",
+    "floor": "6",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-08-19T21:51:06+07:00"
+    "recordedAt": "2026-09-19T01:29:55+07:00"
   },
-  "totalRecords": 114
+  "totalRecords": 115
 }
