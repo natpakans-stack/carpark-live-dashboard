@@ -113,7 +113,8 @@ function carparkBuildStatus_() {
 var CARPARK_MAPS_ = {
   "คอนโด":   "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
   "ที่ทำงาน": "https://maps.app.goo.gl/Gyy37MMCh7x61uy57",
-  "ห้าง":    ""
+  "ห้าง":    "",
+  "อื่นๆ":   ""
 };
 
 function doPost(e) {
