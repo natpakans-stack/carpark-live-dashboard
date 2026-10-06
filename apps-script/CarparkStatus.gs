@@ -103,6 +103,65 @@ function carparkBuildStatus_() {
   };
 }
 
+/**
+ * POST .../exec  ← ฟอร์มที่ tanplanet.work/carpark (แทนฟอร์ม Framer ที่ยกเลิกไปแล้ว)
+ * body = JSON (Content-Type: text/plain กัน CORS preflight)
+ *   { mode: "normal"|"late", location, floor, note, exitDate: "yyyy-MM-dd", time: "HH:mm" }
+ * เขียนแถวหน้าตาเดียวกับที่ Framer เคยเขียน → syncParkingRows (trigger ทุก 1 นาที)
+ * หยิบไปสร้าง Calendar + ส่ง LINE เองเหมือนเดิม
+ */
+var CARPARK_MAPS_ = {
+  "คอนโด":   "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
+  "ที่ทำงาน": "https://maps.app.goo.gl/Gyy37MMCh7x61uy57",
+  "ห้าง":    ""
+};
+
+function doPost(e) {
+  var out = function (o) {
+    return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
+  };
+  try {
+    var b = JSON.parse(e.postData.contents);
+    var loc = String(b.location || "");
+    if (!(loc in CARPARK_MAPS_)) return out({ ok: false, error: "สถานที่ไม่ถูกต้อง" });
+    var floor = String(b.floor || "").trim().slice(0, 6);
+    var note = String(b.note || "").trim().slice(0, 200);
+    var hm = /^\d{1,2}:\d{2}$/;
+    var late = b.mode === "late";
+    var time = String(b.time || "");
+    var exitDate = String(b.exitDate || "");
+    if (!hm.test(time)) return out({ ok: false, error: "เวลาไม่ถูกต้อง" });
+    if (!late && !/^\d{4}-\d{2}-\d{2}$/.test(exitDate)) return out({ ok: false, error: "วันที่ไม่ถูกต้อง" });
+
+    // ลำดับคอลัมน์: Date, timeReminder, parkingMap, parkingFloor, note, parkingLocation,
+    //               exitDateReminder, NoteType, timeForgot
+    var row = [
+      new Date().toISOString().replace(/\.\d+Z$/, "Z"),
+      late ? "" : time,
+      CARPARK_MAPS_[loc],
+      floor,
+      note,
+      loc,
+      late ? "" : exitDate,
+      late ? "กรอกย้อนหลัง" : "",   // ว่าง = ให้ syncParkingRows ส่ง Calendar + LINE
+      late ? time : ""
+    ];
+    var lock = LockService.getScriptLock();
+    lock.waitLock(10000);
+    try {
+      var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEET_NAME);
+      var r = sheet.getRange(sheet.getLastRow() + 1, 1, 1, row.length);
+      r.setNumberFormat("@");   // เก็บเป็นข้อความเหมือนที่ Framer เขียน ไม่ให้ชีตแปลงเป็นวันที่
+      r.setValues([row]);
+    } finally {
+      lock.releaseLock();
+    }
+    return out({ ok: true, status: carparkBuildStatus_() });
+  } catch (err) {
+    return out({ ok: false, error: String(err) });
+  }
+}
+
 /** กรองโน้ตขยะ + แถวทดสอบ (ให้ผลตรงกับ dashboard) */
 function carparkIsNoise_(note) {
   var n = String(note || "").toLowerCase();
