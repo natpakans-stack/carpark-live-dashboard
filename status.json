@@ -1,19 +1,19 @@
 {
-  "updated": "2026-11-20T19:45:31+07:00",
-  "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 2 (1/11/2026 10:31)",
+  "updated": "2026-11-21T03:45:34+07:00",
+  "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 4A (20/11/2026 23:53)",
   "current": {
     "location": "คอนโด",
-    "floor": "2",
-    "time": "10:30",
-    "note": "",
-    "status": "กรอกย้อนหลัง",
+    "floor": "4A",
+    "time": "23:53",
+    "note": "ฝั่งงามวงศ์วาน",
+    "status": "SENT",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-11-01T10:31:21+07:00"
+    "recordedAt": "2026-11-20T23:53:01+07:00"
   },
   "latestCondo": {
-    "floor": "2",
+    "floor": "4A",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-11-01T10:31:21+07:00"
+    "recordedAt": "2026-11-20T23:53:01+07:00"
   },
-  "totalRecords": 121
+  "totalRecords": 122
 }
