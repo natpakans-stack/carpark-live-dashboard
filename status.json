@@ -1,19 +1,19 @@
 {
-  "updated": "2026-11-21T08:47:19+07:00",
-  "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 4A (20/11/2026 23:53)",
+  "updated": "2026-11-21T15:51:01+07:00",
+  "summary": "ล่าสุดจอดที่ ห้าง (21/11/2026 11:05) ชั้น 4 | คอนโดครั้งล่าสุด: ชั้น 4A (20/11/2026 23:53)",
   "current": {
-    "location": "คอนโด",
-    "floor": "4A",
-    "time": "23:53",
-    "note": "ฝั่งงามวงศ์วาน",
+    "location": "ห้าง",
+    "floor": "4",
+    "time": "11:05",
+    "note": "พันธุ์ทิพย์ @ งามวงศ์วาน",
     "status": "SENT",
-    "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-11-20T23:53:01+07:00"
+    "mapUrl": "",
+    "recordedAt": "2026-11-21T11:05:36+07:00"
   },
   "latestCondo": {
     "floor": "4A",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
     "recordedAt": "2026-11-20T23:53:01+07:00"
   },
-  "totalRecords": 122
+  "totalRecords": 123
 }
