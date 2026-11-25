@@ -1,19 +1,19 @@
 {
-  "updated": "2026-11-25T10:37:36+07:00",
-  "summary": "ตอนนี้รถจอดที่ คอนโด ชั้น 5A (23/11/2026 23:29)",
+  "updated": "2026-11-25T20:28:16+07:00",
+  "summary": "ล่าสุดจอดที่ อื่นๆ (25/11/2026 13:49) — ที่นี่ไม่บันทึกชั้น | คอนโดครั้งล่าสุด: ชั้น 5A (23/11/2026 23:29)",
   "current": {
-    "location": "คอนโด",
-    "floor": "5A",
-    "time": "23:29",
-    "note": "จอดตรงทางขึ้น",
+    "location": "อื่นๆ",
+    "floor": "",
+    "time": "13:49",
+    "note": "จอดรถที่ รพ.ทรวงอก",
     "status": "SENT",
-    "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
-    "recordedAt": "2026-11-23T23:29:18+07:00"
+    "mapUrl": "",
+    "recordedAt": "2026-11-25T13:49:35+07:00"
   },
   "latestCondo": {
     "floor": "5A",
     "mapUrl": "https://maps.app.goo.gl/c3ec1nBwubh5dkiL9",
     "recordedAt": "2026-11-23T23:29:18+07:00"
   },
-  "totalRecords": 124
+  "totalRecords": 125
 }
